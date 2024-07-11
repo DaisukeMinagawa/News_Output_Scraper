@@ -35,6 +35,27 @@ response.raise_for_status()
 # HTMLパース
 soup: BeautifulSoup = BeautifulSoup(response.content, "html.parser")
 
+# 記事要素取得（divタグで絞り込み）、もしarticle_elementsが空なら「ウェブサイト構造が変更されました」とエラーを出力して、
+# さらに同メッセージをGmailに送信する。
+if not soup.select('div.story-card.story-card--standard'):
+    print("ウェブサイト構造が変更されました")
+    # Gmailの設定を.envファイルから読み込む
+    load_dotenv()
+    gmail_account: str = os.getenv("GMAIL_ACCOUNT")
+    gmail_password: str = os.getenv("GMAIL_PASSWORD")
+    to_email: str = os.getenv("TO_EMAIL")
+    # メール送信
+    msg = MIMEText("ウェブサイト構造が変更されました")
+    msg["Subject"] = "ProPublicaスクレイピングエラー"
+    msg["From"] = gmail_account
+    msg["To"] = to_email
+    msg["Date"] = formatdate()
+    server = smtplib.SMTP_SSL("smtp.gmail.com", 465)
+    server.login(gmail_account, gmail_password)
+    server.send_message(msg)
+    server.quit()
+    exit()
+
 # 記事要素取得 (divタグで絞り込み)
 article_elements: bs4.element.ResultSet = soup.select(
     "div.story-card.story-card--standard"
