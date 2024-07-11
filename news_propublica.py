@@ -126,8 +126,6 @@ for article in article_elements:
     scraping_count += 1
     print("Scraping success! " + str(scraping_count))
 
-
-
 # ループ後にまとめてDBに登録
 cursor.executemany(
     """
