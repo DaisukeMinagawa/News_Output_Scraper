@@ -5,6 +5,7 @@ import sqlite3
 from datetime import datetime
 import bs4
 import smtplib
+from typing import List
 from email.mime.text import MIMEText
 from email.utils import formatdate
 from dotenv import load_dotenv
@@ -92,13 +93,13 @@ for article in article_elements:
     opener_text_element = article_soup.select_one(
         "h2.opener__dek.opener__dek--match-text-column"
     )
-    opener_text = opener_text_element.get_text().replace("\t", "").replace("\n", " ") if opener_text_element else ""
+    opener_text: str = opener_text_element.get_text().replace("\t", "").replace("\n", " ") if opener_text_element else ""
 
     # `<div>`直下の`<p>`要素で`data-pp-blocktype="copy"`属性を持つものを見つける
-    paragraphs = article_soup.select('div > p[data-pp-blocktype="copy"]')
+    paragraphs: List[BeautifulSoup.Tag] = article_soup.select('div > p[data-pp-blocktype="copy"]')
 
     # opener_textとparagraphsのテキストを結合
-    article_text = [opener_text.strip()] + [p.get_text() for p in paragraphs]
+    article_text: List[str] = [opener_text.strip()] + [p.get_text() for p in paragraphs]
 
     # 記事データを辞書形式でリストに追加
     articles.append((date_str, headline, dek, link, " ".join(article_text)))
